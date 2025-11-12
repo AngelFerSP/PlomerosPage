@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://plomerix.com/sitemap.xml
