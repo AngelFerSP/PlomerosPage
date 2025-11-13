@@ -365,60 +365,32 @@
   </footer>
 
   <!-- Supabase: guarda en waitlist -->
-<script type="module">
-  const REST_URL = 'https://ldeqxmbvenzvkuxvvund.supabase.co/rest/v1/waitlist?on_conflict=email';
-  const PUBLISHABLE = 'sb_publishable_BEujDUPO6toUNYh5ynjMKA_dVNwE5E3'; // NO la secret, solo la Publishable
+<script>
+  const FN_URL = 'https://ldeqxmbvenzvkuxvvund.supabase.co/functions/v1/subscribe-waitlist';
 
-  const form = document.getElementById('notifyForm');
-  const alertBox = document.getElementById('formAlert');
-
-  function showAlert(type, msg) {
-    alertBox.className = `alert alert-${type} mt-3`;
-    alertBox.textContent = msg;
-    alertBox.classList.remove('d-none');
-  }
-
-  form.addEventListener('submit', async (e) => {
+  async function submitWaitlist(e) {
     e.preventDefault();
-    alertBox.classList.add('d-none');
-
-    const hp = document.getElementById('website')?.value;
-    if (hp) return;
-
     const email = document.getElementById('email').value.trim().toLowerCase();
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)) {
-      return showAlert('warning', 'Escribe un correo válido.');
+      alert('Escribe un correo válido.');
+      return;
     }
-
     try {
-      const r = await fetch(REST_URL, {
+      const resp = await fetch(FN_URL, {
         method: 'POST',
-        headers: {
-          'content-type': 'application/json',
-          'prefer': 'resolution=merge-duplicates',
-          // 👇 Usa la PUBLISHABLE (nueva). Estas 2 cabeceras son obligatorias.
-          'apikey': PUBLISHABLE,
-          'authorization': `Bearer ${PUBLISHABLE}`
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email })
       });
-
-      if (!(r.status === 201 || r.status === 204)) {
-        const txt = await r.text();
-        throw new Error(`${r.status} ${txt}`);
-      }
-
-      form.reset();
-      showAlert('success', '¡Listo! Te avisaremos para activar tu perfil en Plomerix.');
+      const json = await resp.json();
+      if (!resp.ok) throw json;
+      alert('¡Listo! Te registramos en la lista de espera.');
+      e.target.reset();
     } catch (err) {
       console.error(err);
-      showAlert('danger', 'Hubo un problema al guardar tu registro.');
+      alert('No se pudo registrar. Intenta de nuevo.');
     }
-  });
+  }
 </script>
-
-
-
 
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
