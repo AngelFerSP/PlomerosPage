@@ -366,51 +366,51 @@
 
   <!-- Supabase: guarda en waitlist -->
   <script type="module">
-    import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
+  import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 
-    // 🔧 Reemplaza con tus datos reales de Supabase:
-    const SUPABASE_URL = 'https://ldeqxmbvenzvkuxvvund.supabase.co'
-    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxkZXF4bWJ2ZW56dmt1eHZ2dW5kIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDE2NjQzMzQsImV4cCI6MjA1NzI0MDMzNH0.6bqWAG73Hmmzu9bZ8t2SEHNibBogPUS6fGUtFfSo5K0'
+  const SUPABASE_URL = 'https://ldeqxmbvenzvkuxvvund.supabase.co'
+  const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxkZXF4bWJ2ZW56dmt1eHZ2dW5kIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDE2NjQzMzQsImV4cCI6MjA1NzI0MDMzNH0.6bqWAG73Hmmzu9bZ8t2SEHNibBogPUS6fGUtFfSo5K0'
+  const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
 
-    const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
-    const form = document.getElementById('notifyForm')
-    const alertBox = document.getElementById('formAlert')
+  const form = document.getElementById('notifyForm')
+  const alertBox = document.getElementById('formAlert')
 
-    function showAlert(type, msg) {
-      alertBox.className = `alert alert-${type} mt-3`
-      alertBox.textContent = msg
-      alertBox.classList.remove('d-none')
+  function showAlert (type, msg) {
+    alertBox.className = `alert alert-${type} mt-3`
+    alertBox.textContent = msg
+    alertBox.classList.remove('d-none')
+  }
+
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault()
+    alertBox.classList.add('d-none')
+
+    // honey pot
+    const hp = document.getElementById('website')?.value
+    if (hp) return
+
+    const emailInput = document.getElementById('email')
+    const email = emailInput.value.trim().toLowerCase()
+
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)) {
+      return showAlert('warning', 'Escribe un correo válido.')
     }
 
-    form.addEventListener('submit', async (e) => {
-      e.preventDefault()
-      alertBox.classList.add('d-none')
+    // upsert para evitar error por duplicado
+    const { error } = await supabase
+      .from('waitlist')
+      .upsert({ email }, { onConflict: 'email', ignoreDuplicates: false })
 
-      const hp = document.getElementById('website').value
-      if (hp) return // bot
+    if (error) {
+      console.error(error)
+      return showAlert('danger', 'Hubo un problema al guardar tu registro. Intenta de nuevo.')
+    }
 
-      const emailInput = document.getElementById('email')
-      const email = emailInput.value.trim().toLowerCase()
+    form.reset()
+    showAlert('success', '¡Listo! Te avisaremos para activar tu perfil en Plomerix.')
+  })
+</script>
 
-      if (!email) {
-        return showAlert('warning', 'Escribe un correo válido.')
-      }
-
-      const userAgent = navigator.userAgent || ''
-
-      const { error } = await supabase
-        .from('waitlist')
-        .insert([{ email }])
-
-      if (error) {
-        console.error(error)
-        return showAlert('danger', 'Hubo un problema al guardar tu registro. Intenta de nuevo.')
-      }
-
-      form.reset()
-      showAlert('success', '¡Listo! Te avisaremos para activar tu perfil en Plomerix.')
-    })
-  </script>
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
 </body>
