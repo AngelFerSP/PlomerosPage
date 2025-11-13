@@ -367,7 +367,7 @@
   <!-- Supabase: guarda en waitlist -->
 <script type="module">
   const REST_URL = 'https://ldeqxmbvenzvkuxvvund.supabase.co/rest/v1/waitlist?on_conflict=email';
-  const ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxkZXF4bWJ2ZW56dmt1eHZ2dW5kIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDE2NjQzMzQsImV4cCI6MjA1NzI0MDMzNH0.6bqWAG73Hmmzu9bZ8t2SEHNibBogPUS6fGUtFfSo5K0';
+  const PUBLISHABLE = 'sb_publishable_BEujDUPO6toUNYh5ynjMKA_dVNwE5E3'; // NO la secret, solo la Publishable
 
   const form = document.getElementById('notifyForm');
   const alertBox = document.getElementById('formAlert');
@@ -394,17 +394,16 @@
       const r = await fetch(REST_URL, {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json',
-          // 👇 estos dos son los que faltan según tu log
-          'apikey': ANON,
-          'Authorization': `Bearer ${ANON}`,
-          // idempotencia para duplicados
-          'Prefer': 'resolution=merge-duplicates'
+          'content-type': 'application/json',
+          'prefer': 'resolution=merge-duplicates',
+          // 👇 Usa la PUBLISHABLE (nueva). Estas 2 cabeceras son obligatorias.
+          'apikey': PUBLISHABLE,
+          'authorization': `Bearer ${PUBLISHABLE}`
         },
         body: JSON.stringify({ email })
       });
 
-      if (!r.ok && r.status !== 201 && r.status !== 204) {
+      if (!(r.status === 201 || r.status === 204)) {
         const txt = await r.text();
         throw new Error(`${r.status} ${txt}`);
       }
@@ -417,6 +416,7 @@
     }
   });
 </script>
+
 
 
 
