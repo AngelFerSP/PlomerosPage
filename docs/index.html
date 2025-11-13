@@ -287,10 +287,10 @@
             <p class="text-secondary mb-3">
               Déjanos tu correo y te contactamos para activar tu perfil cuando Plomerix esté disponible en tu zona.
             </p>
-            <form id="notifyForm" class="row g-2" novalidate>
+           <form id="notifyForm" onsubmit="submitWaitlist(event)">
               <div class="col-12">
                 <label for="email" class="form-label">Correo electrónico</label>
-                <input id="email" name="email" type="email" class="form-control form-control-lg" placeholder="tunegocio@correo.com" required>
+                <input id="email" name="email" type="email" class="form-control form-control-lg" placeholder="tucorreo@correo.com" required>
                 <!-- Honeypot -->
                 <input type="text" id="website" name="website" class="d-none" tabindex="-1" autocomplete="off">
               </div>
@@ -365,6 +365,11 @@
   </footer>
 
   <!-- Supabase: guarda en waitlist -->
+<form id="notifyForm" onsubmit="submitWaitlist(event)">
+  <input id="email" type="email" placeholder="tu@correo.com" required>
+  <button type="submit">Quiero que me avisen</button>
+</form>
+
 <script>
   const FN_URL = 'https://ldeqxmbvenzvkuxvvund.supabase.co/functions/v1/subscribe-waitlist';
 
@@ -391,6 +396,10 @@
     }
   }
 </script>
+
+
+
+
 
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
