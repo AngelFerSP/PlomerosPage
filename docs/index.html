@@ -400,7 +400,7 @@
 
       const { error } = await supabase
         .from('waitlist')
-        .insert([{ email, source: 'landing_plomeros', user_agent: userAgent }])
+        .insert([{ email }])
 
       if (error) {
         console.error(error)
